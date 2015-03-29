@@ -73,7 +73,7 @@
             ?>
             <!--Managers table Start-->
             <div class="col-lg-8 col-lg-offset-3 col-md-8 col-md-offset-3 col-sm-8 col-sm-offset-3 pushDown">
-                <form ID="HomeForm" class="col-lg-12" role="form" action="ManagersTableView.php?sortOrder=<?php echo $sortOrder; ?>" method="GET">
+                <form ID="HomeForm" class="col-lg-12" role="form" method="POST" action="deleteSelectedManagers.php" action="ManagersTableView.php?sortOrder=<?php echo $sortOrder; ?>" method="GET">
                     <table class ="col-lg-12 col-md-12 col-sm-12 homeTable table-responsive table-condensed table-striped table-hover  " >
                         <!--
                         <?php
