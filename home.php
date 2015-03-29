@@ -8,6 +8,17 @@
         require_once 'Event.php';
         require_once 'Connection.php';
         require_once 'EventTableGateway.php';
+
+        if (isset($_GET) && isset($_GET['sortOrder'])) {
+            $sortOrder = $_GET['sortOrder'];
+            //checking input against my column names and if inpout is malisious just set to 'name' , completly avoid a SQL injection attack
+            $colunNames = array("eventID", "title", "description", "startDate", "endDate", "time", "maxAttendees", "cost", "managerID");
+            if (!in_array($sortOrder, $colunNames)) {
+                $sortOrder = 'title';
+            }
+        } else {
+            $sortOrder = 'title';
+        }
         ?>
     </head>
     <body class="greenBG">
@@ -21,7 +32,7 @@
             $connection = Connection::getInstance();
             $gateway = new EventTableGateway($connection);
 
-            $statement = $gateway->getEvents();
+            $statement = $gateway->getEvents($sortOrder);
             /* creating the session */
             $id = session_id();
             /* checking if there is not already a session and if there is start it */
@@ -61,22 +72,22 @@
                 <form ID="HomeForm" class="col-lg-12" method="POST" action="deleteSelectedEvents.php">
                     <table class ="homeTable table-responsive  table-condensed table-striped table-hover  " >
                         <!--<?php
-                        $username = $_SESSION['username'];
-                        echo '<h4> Welcome, ' . $username . '</h4>';
-                        ?>
+            $username = $_SESSION['username'];
+            echo '<h4> Welcome, ' . $username . '</h4>';
+            ?>
                         -->
                         <thead>
                             <tr id="bleh">
                                 <th><input type="checkbox" onclick="checkAll(this)"><br></th>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th class="thPush">Start Date</th>
-                                <th class="thPush">End Date </th>
-                                <th>Time</th>
-                                <th>Max Attendees</th>
-                                <th>Cost</th>
-                                <th>Manager ID</th>
+                                <th><a href="home.php?sortOrder=eventID">ID</a></th>
+                                <th><a href="home.php?sortOrder=title">Title</a></th>
+                                <th><a href="home.php?sortOrder=description">Description</a></th>
+                                <th class="thPush"><a href="home.php?sortOrder=startDate">Start Date</a></th>
+                                <th class="thPush"><a href="home.php?sortOrder=endDate">End Date </a></th>
+                                <th><a href="home.php?sortOrder=time">Time</a></th>
+                                <th><a href="home.php?sortOrder=maxAttendees">Max Attendees</a></th>
+                                <th><a href="home.php?sortOrder=cost">Cost</a></th>
+                                <th><a href="home.php?sortOrder=managerID">Manager ID</a></th>
                                 <th  class="col-lg-3">Options</th>
                             </tr>
 
@@ -117,9 +128,9 @@
                         }
                         ?>
                         </tbody>
-                    </table>  
-                    <table >
-                        <tr >
+                    </table>
+                    <table>
+                        <tr>
                             <td><input type="submit" class="niceFont deleteSelectedBTN btn btn-md btn-info" name="deleteSelected" value="Delete Selected" /></td>
                             <td><a href="createEventForm.php" class=" col-lg-12 col-lg-push-2 btn btn-md btn-info"> Create Event</a></td>		 
                         </tr> 

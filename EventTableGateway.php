@@ -7,13 +7,15 @@ class EventTableGateway {
     public function __construct($c) {
         $this->connection = $c;
     }
-    public function getEvents() {
+    public function getEvents($sortOrder) {
         // execute a query to get all programmers
-        $sqlQuery = "SELECT * FROM event";
+        $sqlQuery = "SELECT * FROM event ORDER BY " . $sortOrder;
         
         $statement = $this->connection->prepare($sqlQuery);
+       // $params = array(
+       //     "sortOrder" => $sortOrder
+       // );
         $status = $statement->execute();
-        
         if (!$status) {
             die("Could not retrieve users eventtablegateway1");
         }

@@ -6,13 +6,22 @@ class ManagerTableGateway {
     public function __construct($c) {
         $this->connection = $c;
     }
-    public function getManagers() {
+    public function getManagers($sortOrder, $filterName) {
         // execute a query to get all programmers
-        $sqlQuery = "SELECT * FROM managers";
+        $sqlQuery = "SELECT * FROM managers " .
+                (($filterName == NULL) ? "" : "WHERE name LIKE :filterName") .
+                " ORDER BY " . $sortOrder;
         
         $statement = $this->connection->prepare($sqlQuery);
-        $status = $statement->execute();
-        
+        if($filterName != NULL){
+            $params = array(
+                "filterName" => "%" . $filterName . "%"
+            );
+            $status = $statement->execute($params);
+        }
+        else{
+            $status = $statement->execute();
+        }
         if (!$status) {
             die("Could not retrieve Managers");
         }

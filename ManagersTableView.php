@@ -8,7 +8,24 @@
         require_once 'Manager.php';
         require_once 'Connection.php';
         require_once 'ManagerTableGateway.php';
+
+        if (isset($_GET) && isset($_GET['sortOrder'])) {
+            $sortOrder = $_GET['sortOrder'];
+            //checking input against my column names and if inpout is malisious just set to 'name' , completly avoid a SQL injection attack
+            $colunNames = array("managerID", "name", "managerEmail");
+            if (!in_array($sortOrder, $colunNames)) {
+                $sortOrder = 'name';
+            }
+        } else {
+            $sortOrder = 'name';
+        }
+        if (isset($_GET) && isset($_GET['filterName'])) {
+            $filterName = filter_input(INPUT_GET, 'filterName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        } else {
+            $filterName = NULL;
+        }
         ?>
+
     </head>
     <body class="greenBG">
         <?php
@@ -21,7 +38,7 @@
             $connection = Connection::getInstance();
             $gateway = new ManagerTableGateway($connection);
 
-            $statement = $gateway->getManagers();
+            $statement = $gateway->getManagers($sortOrder, $filterName);
             /* creating the session */
             $id = session_id();
             /* checking if there is not already a session and if there is start it */
@@ -46,55 +63,20 @@
                 echo '<p>' . $message . '</p>';
             }
             ?>
-            <!-- SCRAP -----------------<div class="otherTablesBox col-lg-3">
-                 <h1 class="font2 col-lg-2 col-lg-push-2">Other Tables</h1>
-                     <div class="col-lg-2">
-                         <table class="displayingOtherTables table-responsive table-condensed ">
- 
-                             <tr>
-                                 <td><img src="img/notepad.png" /></td>
-                                 <td><a href = "home.php">Events</a></td>
-                             </tr>
-                             <tr>
-                                 <td><img src="img/manager.png" /></td>
-                                 <td><a href = "ManagersTableView.php">Managers</a></td>
-                             </tr>
-                             <tr>
-                                 <td><img src="img/organiser.png" /></td>
-                                 <td><a href = "#.php">Organisers</a></td>
-                             </tr>
-                             <tr>
-                                 <td><img src="img/asset.png" /></td>
-                                 <td><a href = "#.php">Assets</a></td>
-                             </tr>
-                             <tr>
-                                 <td><img src="img/location.png" /></td>
-                                 <td><a href = "#.php">Location</a></td>
-                             </tr>
-                             <tr>
-                                 <td><img src="img/attendee.png" /></td>
-                                 <td><a href = "#.php">Attendee</a></td>
-                             </tr>
-                         </table>
-                     </div>
-            -->
-
-<!-- requiring the Code for the side bar -->
+            <!-- requiring the Code for the side bar -->
             <?php
             require 'sideBar.php';
             ?>
-
-            
-           
             <!-- requiring the Code for the top information bar -->
             <?php
             require 'topInformationBar.php';
             ?>
             <!--Managers table Start-->
             <div class="col-lg-8 col-lg-offset-3 col-md-8 col-md-offset-3 col-sm-8 col-sm-offset-3 pushDown">
-                <form ID="HomeForm" class="col-lg-12" method="POST" action="deleteSelectedManagers.php">
-                    <table class ="homeTable table-responsive table-condensed table-striped table-hover  " >
-                        <!--<?php
+                <form ID="HomeForm" class="col-lg-12" role="form" action="ManagersTableView.php?sortOrder=<?php echo $sortOrder; ?>" method="GET">
+                    <table class ="col-lg-12 col-md-12 col-sm-12 homeTable table-responsive table-condensed table-striped table-hover  " >
+                        <!--
+                        <?php
                         $username = $_SESSION['username'];
                         echo '<h4> Welcome, ' . $username . '</h4>';
                         ?>
@@ -102,9 +84,9 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" onclick="checkAll(this)"><br></th>
-                                <th>ManagerID</th>
-                                <th>Name</th>
-                                <th>Email</th>
+                                <th> <a href="ManagersTableView.php?sortOrder=managerID">ManagerID</a></th>
+                                <th><a href="ManagersTableView.php?sortOrder=name">Name</a></th>
+                                <th><a href="ManagersTableView.php?sortOrder=managerEmail">Email</a></th>
                                 <th>Options</th>
                             </tr>
                         </thead>
@@ -136,19 +118,24 @@
                         }
                         ?>
                         </tbody>
-                    </table>  
-                    <table>
-
-                        <tr>
-
-                            <td><input type="submit" class=" deleteSelectedBTN btn btn-md btn-info" name="deleteSelected" value="Delete Selected" /></td>
-                            <td><a href="createManagerform.php" class=" col-lg-12 col-lg-push-2 btn btn-md btn-info"> Create Manager</a></td>		 
-                        </tr> 
                     </table>
-                </form>
+                    <table class="col-lg-12 col-md-12 col-sm-12">
+                        <tr>
+                            <td><input type="submit" class="col-lg-6  deleteSelectedBTN btn btn-md btn-info" name="deleteSelected" value="Delete Selected" /></td>
+                            <td><a href="createManagerform.php" class=" col-lg-6 col-lg-pull-4 col-md-pull-4 col-sm-pull-2 btn btn-md btn-info"> Create Manager</a></td>
+                            <td><input type="text" name="filterName" class=" col-lg-3  form-control " placeholder="Search Manager" value="<?php echo $filterName; ?>"/></td>
+                            <!--<td><button type="submit" name="filterBtn" id="filterBtn" class="btn "><span class="hidden-xs glyphicon glyphicon-search" style=""></span></button></td>-->
+                        </tr>
 
-            </div>
-            <!--Managers table End-->
+
+                    </table>
+                    
+
+                    
+
+
+                </form>
+            </div><!--Managers table End-->
         </div> 
 
     </body>
